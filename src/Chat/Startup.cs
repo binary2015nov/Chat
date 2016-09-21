@@ -3,19 +3,52 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Reflection;
+using System.Threading.Tasks;
 using Funq;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using ServiceStack;
 using ServiceStack.Auth;
 using ServiceStack.Configuration;
-using ServiceStack.Razor;
 using ServiceStack.Redis;
 using ServiceStack.Text;
 
 namespace Chat
 {
+    public class Startup
+    {
+        // This method gets called by the runtime. Use this method to add services to the container.
+        // For more information on how to configure your application, visit http://go.microsoft.com/fwlink/?LinkID=398940
+        public void ConfigureServices(IServiceCollection services)
+        {
+        }
+
+        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        {
+            loggerFactory.AddConsole();
+
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+
+            app.UseServiceStack(new AppHost());
+
+            app.Run(async (context) =>
+            {
+                await context.Response.WriteAsync("Hello World!");
+            });
+        }
+    }
+
     public class AppHost : AppHostBase
     {
-        public AppHost() : base("Chat", typeof (ServerEventsServices).Assembly)
+        public AppHost() : base("Chat", typeof(ServerEventsServices).GetTypeInfo().Assembly)
         {
             var liveSettings = "~/appsettings.txt".MapHostAbsolutePath();
             AppSettings = File.Exists(liveSettings)
@@ -26,10 +59,10 @@ namespace Chat
         public override void Configure(Container container)
         {
             JsConfig.EmitCamelCaseNames = true;
- 
-            Plugins.Add(new RazorFormat());
+
             Plugins.Add(new ServerEventsFeature());
-            SetConfig(new HostConfig {
+            SetConfig(new HostConfig
+            {
                 DefaultContentType = MimeTypes.Json,
                 AllowSessionIdsInHttpParams = true,
             });
@@ -46,15 +79,15 @@ namespace Chat
 
             container.RegisterAutoWiredAs<MemoryChatHistory, IChatHistory>();
 
-            var redisHost = AppSettings.GetString("RedisHost");
-            if (redisHost != null)
-            {
-                container.Register<IRedisClientsManager>(new RedisManagerPool(redisHost));
+            //var redisHost = AppSettings.GetString("RedisHost");
+            //if (redisHost != null)
+            //{
+            //    container.Register<IRedisClientsManager>(new RedisManagerPool(redisHost));
 
-                container.Register<IServerEvents>(c =>
-                    new RedisServerEvents(c.Resolve<IRedisClientsManager>()));
-                container.Resolve<IServerEvents>().Start();
-            }
+            //    container.Register<IServerEvents>(c =>
+            //        new RedisServerEvents(c.Resolve<IRedisClientsManager>()));
+            //    container.Resolve<IServerEvents>().Start();
+            //}
 
             // for lte IE 9 support
             Plugins.Add(new CorsFeature());
@@ -158,7 +191,6 @@ namespace Chat
         public ResponseStatus ResponseStatus { get; set; }
     }
 
-
     public class ServerEventsServices : Service
     {
         public IServerEvents ServerEvents { get; set; }
@@ -252,16 +284,8 @@ namespace Chat
         }
     }
 
-    public class Global : System.Web.HttpApplication
-    {
-        protected void Application_Start(object sender, EventArgs e)
-        {
-            new AppHost().Init();
-        }
-    }
-
     [Route("/account")]
-    public class GetUserDetails {}
+    public class GetUserDetails { }
 
     public class GetUserDetailsResponse
     {
@@ -301,4 +325,5 @@ namespace Chat
             return session.ConvertTo<GetUserDetailsResponse>();
         }
     }
+
 }
