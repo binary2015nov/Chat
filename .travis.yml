@@ -14,8 +14,7 @@ matrix:
 script:
   - cd src/Chat && dotnet restore && dotnet build && dotnet publish
   - cd ../..
-  - docker login -u AWS -p $AWS_ECS_PASSWORD -e none $AWS_ECS_REPOURL
+  - docker login -u AWS -p $AWS_ECS_PASSWORD -e none https://$AWS_ECS_REPO_DOMAIN
   - docker build -t netcoreapps .
-  - docker tag netcoreapps:latest $AWS_ECS_REPOURL/netcoreapps:latest
-  - docker push $AWS_ECS_REPOURL/netcoreapps:latest
-  
+  - docker tag netcoreapps:latest $AWS_ECS_REPO_DOMAIN/netcoreapps:latest
+  - docker push $AWS_ECS_REPO_DOMAIN/netcoreapps:latest
