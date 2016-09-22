@@ -1,4 +1,4 @@
-Chat
+Chat [![Build Status](https://travis-ci.org/NetCoreApps/Chat.svg?branch=master)](https://travis-ci.org/NetCoreApps/Chat)
 =====
 
 Chat showcases ServiceStack's new support for [Server Sent Events](http://www.html5rocks.com/en/tutorials/eventsource/basics/) with a cursory Chat app packed with a number of features including:
