@@ -13,5 +13,5 @@ matrix:
       env: DOTNETCORE=1
 script:
   - cd src/Chat && dotnet restore && dotnet build && dotnet publish
-  - docker build -t ChatApp
+  - docker build -t ChatApp .
 
