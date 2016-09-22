@@ -1,5 +1,8 @@
+sudo: required
 language: csharp
 solution: src/Chat.sln
+services:
+  - docker
 matrix:
   include:
     - os: linux
@@ -9,4 +12,6 @@ matrix:
       mono: none
       env: DOTNETCORE=1
 script:
-  - cd src/Chat && dotnet restore && dotnet build
+  - cd src/Chat && dotnet restore && dotnet build && dotnet publish
+  - docker build -t ChatApp
+
