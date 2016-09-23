@@ -1,3 +1,8 @@
 FROM microsoft/dotnet:latest
-COPY src/Chat/bin/Debug/netcoreapp1.0/publish/ /root/
+COPY src/Chat /app
+WORKDIR /app
+RUN ["dotnet", "restore"]
+RUN ["dotnet", "build"]
+ 
 EXPOSE 5000/tcp
+ENTRYPOINT ["dotnet", "run", "--server.urls", "http://0.0.0.0:5000"]
