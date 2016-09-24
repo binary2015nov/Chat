@@ -1,4 +1,4 @@
-FROM microsoft/dotnet:latest
+FROM microsoft/dotnet:1.0-core
 COPY src/Chat /app
 WORKDIR /app
 RUN ["dotnet", "restore"]
