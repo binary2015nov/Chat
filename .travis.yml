@@ -21,5 +21,5 @@ script:
   - docker push $AWS_ECS_REPO_DOMAIN/netcoreapps:latest
   - aws ecs register-task-definition --cli-input-json file://task-definition.json --region ap-southeast-2
   - TASK_REVISION=$(aws ecs describe-task-definition --task-definition netcoreapps-chat-task --region ap-southeast-2 | ./jq '.taskDefinition.revision')
-  - NEW_REVISION = $((TASK_REVISION + 1))
+  - NEW_REVISION=$((TASK_REVISION + 1))
   - aws ecs update-service --cluster netcoreapps --service netcoreapps-chat-service --task-definition "netcoreapps-chat-task:$NEW_REVISION" -- region ap-southeast-2
