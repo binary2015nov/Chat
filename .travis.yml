@@ -18,3 +18,7 @@ script:
   - docker build -t netcoreapps .
   - docker tag netcoreapps:latest $AWS_ECS_REPO_DOMAIN/netcoreapps:latest
   - docker push $AWS_ECS_REPO_DOMAIN/netcoreapps:latest
+  - aws ecs register-task-definition --cli-input-json file://task-definition.json
+  - TASK_REVISION=$(aws ecs describe-task-definition --task-definition netcoreapps-chat-task --region ap-southeast-2 --profile docker | ./jq '.taskDefinition.revision')
+  - NEW_REVISION = $((TASK_REVISION + 1))
+  - aws ecs update-service --cluster netcoreapps --service netcoreapps-chat-service --task-definition "netcoreapps-chat-task:$NEW_REVISION"
