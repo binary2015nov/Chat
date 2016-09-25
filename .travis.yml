@@ -12,6 +12,7 @@ matrix:
       mono: none
       env: DOTNETCORE=1
 script:
+  - sudo apt-get install jq #install jq for json parsing
   - pip install --user awscli # install aws cli w/o sudo
   - export PATH=$PATH:$HOME/.local/bin # put aws in the path
   - eval $(aws ecr get-login --region ap-southeast-2) #needs AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY envvars
