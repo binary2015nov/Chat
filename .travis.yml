@@ -22,4 +22,7 @@ script:
   - aws ecs register-task-definition --cli-input-json file://task-definition.json --region ap-southeast-2
   - TASK_REVISION=$(aws ecs describe-task-definition --task-definition netcoreapps-chat-task --region ap-southeast-2 | jq '.taskDefinition.revision')
   - aws ecs update-service --cluster default --service netcoreapps-chat-service --task-definition "netcoreapps-chat-task:$TASK_REVISION" --region ap-southeast-2
-  - aws ecs stop-task --task $(aws ecs list-tasks --region ap-southeast-2 --service-name netcoreapps-chat-service | jq '.taskArns[0]' | jq 'split(":task/")[1]') --region ap-southeast-2
+  - TEMP_ARN=$(aws ecs list-tasks --region ap-southeast-2 --service-name netcoreapps-chat-service | jq '.taskArns[0]')
+  - TASK_ARN="${TEMP_ARN%\"}"
+  - TASK_ARN="${TASK_ARN#\"}"
+  - aws ecs stop-task --task $TASK_ARN --region ap-southeast-2
