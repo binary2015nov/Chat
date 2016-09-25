@@ -23,6 +23,44 @@ Chat showcases ServiceStack's new support for [Server Sent Events](http://www.ht
     - Display an image url
     - Raise DOM events
 
+## Chat on .NetCore with Deployment to AWS EC2 Container Services
+We've updated this repository to work with ServiceStack preview .NetCore support and showing a simple deployment process to AWS EC2 Container Services.
+
+This setup runs the Chat application on a simple custom Docker image based on Microsoft's `microsoft/dotnet:latest` image. The Chat application is then built into this custom image and uploaded to AWS EC2 Container Repository.
+
+Part of the advantage of running .NetCore is being able to use common Linux tooling and services like Travis CI. This Chat Docker image is built and uploaded via Travis CI and then the AWS CLI is used to trigger a deployment and restart of the services.
+> Note if this application was setup to run across multiple containers and ports behind and load balancer, this would allow for zero down time deployment, but to keep this tutorial simple we are just restarting the single container service.
+
+#### AWS EC2 Container Service setup
+To set this up, you'll need an AWS account and use of a region that supports EC2 Container Services (ECS). 
+
+First some basics. AWS ECS is an orchestration setup for hosting and deploying Docker applications, it still needs EC2 instances to run the services on. 
+AWS provides pre-built AWS EC2 images (AMIs) optimised for ECS, so first you'll need to start a new EC2 instance running this image.
+
+1. Goto the AWS EC2 console and select `Launch instance`.
+2. Click `Community AMIs`.
+3. Search for `ecs-optimized`.
+4. Pick the latest image listed.
+5. Choose your instance size, t2.micro will be enough for a demo application.
+6. Ensure you open appropriate ports like `80`, `22` etc so you can access the instance. Tag the instance so you can easily find it in your console.
+7. Launch instance
+
+Once your instance has started and is ready to use, navigate to the AWS EC2 Container Services console.
+
+If this is your first time using ECS, the newly created instance should also create a `default` Cluster. If not, you will need to configure a new cluster, it can be called whatever you like.
+
+#### AWS Docker Repository
+To make this process more integrated, AWS also provides a provide Docker repository to upload your images. This will feed into the build process as it is where our built Chat docker image has to be uploaded before it is deployed.
+
+1. Navigate to the `Repositories` menu on the left and click `Create repository`.
+2. Name your repository.
+
+Once this is done, you'll be presented with a screen that helps you with some of the command line instructions required to upload to your new repostiory.
+
+
+#### AWS ECS Tasks and Services
+
+
 ### Feature Preview
 
 ![Chat Overview](https://raw.githubusercontent.com/ServiceStack/Assets/master/img/apps/Chat/chat-overview.gif)
