@@ -1,17 +1,13 @@
 {
     "family": "netcoreapps-chat-task",
+    "networkMode": "host",
     "containerDefinitions": [
         {
             "image": "831181395254.dkr.ecr.ap-southeast-2.amazonaws.com/netcoreapps:latest",
             "name": "netcoreapps-chat-container",
             "cpu": 10,
             "memory": 256,
-            "essential": true,
-            "portMappings": [
-                {
-                    "containerPort": 5000
-                }
-            ]
+            "essential": true
         }
     ]
 }
