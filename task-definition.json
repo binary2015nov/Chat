@@ -1,6 +1,6 @@
 {
     "family": "netcoreapps-chat-task",
-    "networkMode": "host",
+    "networkMode": "bridge",
     "containerDefinitions": [
         {
             "image": "831181395254.dkr.ecr.ap-southeast-2.amazonaws.com/netcoreapps:latest",
@@ -10,11 +10,11 @@
             "essential": true,
             "portMappings": [
                 {
+                    "hostPort": 5000,
                     "containerPort": 5000,
                     "protocol": "tcp"
                 }
-            ],
-            "hostname": "chat-demo.layoric.org"
+            ]
         }
     ]
 }
