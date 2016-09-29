@@ -1,6 +1,6 @@
 {
     "family": "netcoreapps-chat-task",
-    "networkMode": "bridge",
+    "networkMode": "host",
     "containerDefinitions": [
         {
             "image": "831181395254.dkr.ecr.ap-southeast-2.amazonaws.com/netcoreapps:latest",
@@ -10,7 +10,6 @@
             "essential": true,
             "portMappings": [
                 {
-                    "hostPort": 5000,
                     "containerPort": 5000,
                     "protocol": "tcp"
                 }
