@@ -22,7 +22,8 @@ docker tag $IMAGE_NAME $AWS_ECS_REPO_DOMAIN/$IMAGE_NAME:$IMAGE_VERSION
 docker push $AWS_ECS_REPO_DOMAIN/$IMAGE_NAME:$IMAGE_VERSION
 aws ecs register-task-definition --cli-input-json file://task-definition.json --region $AWS_DEFAULT_REGION > /dev/null # Create a new task revision
 TASK_REVISION=$(aws ecs describe-task-definition --task-definition $ECS_TASK --region $AWS_DEFAULT_REGION | jq '.taskDefinition.revision') #get latest revision
-if [ aws ecs list-services --cluster $AWS_ECS_CLUSTER_NAME | jq '.serviceArns' | jq 'contains(["arn:aws:ecs:$AWS_DEFAULT_REGION:$AWS_ACCOUNT_NUMBER:service/$ECS_SERVICE"])' ]; then
+CREATE_NEW_SERVICE=$(aws ecs list-services --region ap-southeast-2 --cluster $AWS_ECS_CLUSTER_NAME | jq '.serviceArns' | jq 'contains(["arn:aws:ecs:$AWS_DEFAULT_REGION:$AWS_ACCOUNT_NUMBER:service/$ECS_SERVICE"])')
+if [ "$CREATE_NEW_SERVICE" = "true" ]; then
     echo "ECS Service already exists"
 else
     echo "Creating ECS Service $ECS_SERVICE"
