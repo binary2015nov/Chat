@@ -12,17 +12,5 @@ matrix:
       mono: none
       env: DOTNETCORE=1
 script:
-  - sudo apt-get install jq #install jq for json parsing
-  - pip install --user awscli # install aws cli w/o sudo
-  - export PATH=$PATH:$HOME/.local/bin # put aws in the path
-  - eval $(aws ecr get-login --region ap-southeast-2) #needs AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY envvars
-  - docker build -t netcoreapps .
-  - docker tag netcoreapps $AWS_ECS_REPO_DOMAIN/netcoreapps:latest
-  - docker push $AWS_ECS_REPO_DOMAIN/netcoreapps:latest
-  - aws ecs register-task-definition --cli-input-json file://task-definition.json --region ap-southeast-2 > /dev/null # Create a new task revision
-  - TASK_REVISION=$(aws ecs describe-task-definition --task-definition netcoreapps-chat-task --region ap-southeast-2 | jq '.taskDefinition.revision') #get latest revision
-  - aws ecs update-service --cluster default --service netcoreapps-chat-service --task-definition "netcoreapps-chat-task:$TASK_REVISION" --region ap-southeast-2 > /dev/null #update service with latest task revision
-  - TEMP_ARN=$(aws ecs list-tasks --region ap-southeast-2 --service-name netcoreapps-chat-service | jq '.taskArns[0]') # Get current running task ARN
-  - TASK_ARN="${TEMP_ARN%\"}" # strip double quotes
-  - TASK_ARN="${TASK_ARN#\"}" # strip double quotes
-  - aws ecs stop-task --task $TASK_ARN --region ap-southeast-2 > /dev/null # Stop current task to force start of new task revision with new image
+  - chmod +x ./build_deploy.sh
+  - ./build_deploy.sh
