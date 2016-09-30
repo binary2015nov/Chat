@@ -25,11 +25,11 @@ TASK_REVISION=$(aws ecs describe-task-definition --task-definition $ECS_TASK --r
 CREATE_NEW_SERVICE=$(aws ecs list-services --region ap-southeast-2 --cluster $AWS_ECS_CLUSTER_NAME | jq '.serviceArns' | jq 'contains(["arn:aws:ecs:$AWS_DEFAULT_REGION:$AWS_ACCOUNT_NUMBER:service/$ECS_SERVICE"])')
 if [ "$CREATE_NEW_SERVICE" = "true" ]; then
     echo "ECS Service already exists"
+    aws ecs update-service --cluster $AWS_ECS_CLUSTER_NAME --service $ECS_SERVICE --task-definition "$ECS_TASK:$TASK_REVISION" --desired-count 1 --region $AWS_DEFAULT_REGION > /dev/null #update service with latest task revision
 else
     echo "Creating ECS Service $ECS_SERVICE"
-    aws ecs update_service --cluster $AWS_ECS_CLUSTER_NAME --service-name $ECS_SERVICE --task-definition $ECS_TASK:$TASK_REVISION --desired-count 1 --region $AWS_DEFAULT_REGION
+    aws ecs create-service --cluster $AWS_ECS_CLUSTER_NAME --service-name $ECS_SERVICE --task-definition "$ECS_TASK:$TASK_REVISION" --desired-count 1 --region $AWS_DEFAULT_REGION > /dev/null #create service
 fi
-aws ecs update-service --cluster $AWS_ECS_CLUSTER_NAME --service $ECS_SERVICE --task-definition "$ECS_TASK:$TASK_REVISION" --region $AWS_DEFAULT_REGION > /dev/null #update service with latest task revision
 TEMP_ARN=$(aws ecs list-tasks --service-name $ECS_SERVICE --region $AWS_DEFAULT_REGION | jq '.taskArns[0]') # Get current running task ARN
 TASK_ARN="${TEMP_ARN%\"}" # strip double quotes
 TASK_ARN="${TASK_ARN#\"}" # strip double quotes
