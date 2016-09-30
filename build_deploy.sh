@@ -27,7 +27,7 @@ if [ "$CREATE_NEW_SERVICE" = "true" ]; then
     echo "ECS Service already exists"
 else
     echo "Creating ECS Service $ECS_SERVICE"
-    aws ecs create-service --service-name $ECS_SERVICE --task-definition $ECS_TASK:$TASK_REVISION --desired-count 1 --region $AWS_DEFAULT_REGION
+    aws ecs update_service --cluster $AWS_ECS_CLUSTER_NAME --service-name $ECS_SERVICE --task-definition $ECS_TASK:$TASK_REVISION --desired-count 1 --region $AWS_DEFAULT_REGION
 fi
 aws ecs update-service --cluster $AWS_ECS_CLUSTER_NAME --service $ECS_SERVICE --task-definition "$ECS_TASK:$TASK_REVISION" --region $AWS_DEFAULT_REGION > /dev/null #update service with latest task revision
 TEMP_ARN=$(aws ecs list-tasks --service-name $ECS_SERVICE --region $AWS_DEFAULT_REGION | jq '.taskArns[0]') # Get current running task ARN
