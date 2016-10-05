@@ -58,8 +58,6 @@ namespace Chat
 
         public override void Configure(Container container)
         {
-            JsConfig.EmitCamelCaseNames = true;
-
             Plugins.Add(new ServerEventsFeature());
             SetConfig(new HostConfig
             {
@@ -78,17 +76,7 @@ namespace Chat
                 }));
 
             container.RegisterAutoWiredAs<MemoryChatHistory, IChatHistory>();
-
-            //var redisHost = AppSettings.GetString("RedisHost");
-            //if (redisHost != null)
-            //{
-            //    container.Register<IRedisClientsManager>(new RedisManagerPool(redisHost));
-
-            //    container.Register<IServerEvents>(c =>
-            //        new RedisServerEvents(c.Resolve<IRedisClientsManager>()));
-            //    container.Resolve<IServerEvents>().Start();
-            //}
-
+            
             // for lte IE 9 support
             Plugins.Add(new CorsFeature());
         }
