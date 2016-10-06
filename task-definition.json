@@ -1,17 +1,28 @@
 {
-    "family": "netcoreapps-chat-task",
-    "networkMode": "host",
+    "family": "__ECS_TASK__",
+    "networkMode": "bridge",
     "containerDefinitions": [
         {
-            "image": "831181395254.dkr.ecr.ap-southeast-2.amazonaws.com/netcoreapps:latest",
-            "name": "netcoreapps-chat-container",
+            "image": "__AWS_ECS_REPO_DOMAIN__/__IMAGE_NAME__:__IMAGE_VERSION__",
+            "name": "__IMAGE_NAME__-container",
             "cpu": 128,
             "memory": 256,
             "essential": true,
             "portMappings": [
                 {
                     "containerPort": 5000,
+                    "hostPort": 5000,
                     "protocol": "tcp"
+                }
+            ],
+            "environment": [
+                {
+                    "name": "VIRTUAL_HOST",
+                    "value": "chat.layoric.org"
+                },
+                {
+                    "name": "VIRTUAL_PORT",
+                    "value": "5000"
                 }
             ]
         }
