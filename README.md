@@ -23,12 +23,12 @@ Chat showcases ServiceStack's new support for [Server Sent Events](http://www.ht
     - Display an image url
     - Raise DOM events
 
-## Chat on .NetCore with Deployment to AWS EC2 Container Services
-We've updated this repository to work with ServiceStack preview .NetCore support and showing a simple deployment process to AWS EC2 Container Services.
+## Chat on .NET Core with Deployment to AWS EC2 Container Services
+We've updated this repository to work with ServiceStack preview .NET Core support and showing a simple deployment process to AWS EC2 Container Services.
 
 This setup runs the Chat application on a simple custom Docker image based on Microsoft's `microsoft/dotnet:latest` image. The Chat application is then built into this custom image and uploaded to AWS EC2 Container Repository.
 
-Part of the advantage of running .NetCore is being able to use common Linux tooling and services like Travis CI. This Chat Docker image is built and uploaded via Travis CI and then the AWS CLI is used to trigger a deployment and restart of the services.
+Part of the advantage of running .NET Core is being able to use common Linux tooling and services like Travis CI. This Chat Docker image is built and uploaded via Travis CI and then the AWS CLI is used to trigger a deployment and restart of the services.
 > Note if this application was setup to run across multiple containers and ports behind and load balancer, this would allow for zero down time deployment, but to keep this tutorial simple we are just restarting the single container service.
 
 #### AWS EC2 Container Service setup
