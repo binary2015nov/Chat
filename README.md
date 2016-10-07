@@ -72,7 +72,7 @@ Review your role information and then choose Create Role to finish.
 8. Choose the Trust Relationships tab, and Edit Trust Relationship.
 
 9. Verify that the trust relationship contains the following policy. If the trust relationship matches the policy below, choose Cancel. If the trust relationship does not match, copy the policy into the Policy Document window and choose Update Trust Policy.
-
+``` json
 {
   "Version": "2008-10-17",
   "Statement": [
@@ -86,6 +86,7 @@ Review your role information and then choose Create Role to finish.
     }
   ]
 }
+```
 
 #### Create your EC2 instance for use with ECS
 
