@@ -35,19 +35,74 @@ Part of the advantage of running .NET Core is being able to use common Linux too
 To set this up, you'll need an AWS account and use of a region that supports EC2 Container Services (ECS). 
 
 First some basics. AWS ECS is an orchestration setup for hosting and deploying Docker applications, it still needs EC2 instances to run the services on. 
-AWS provides pre-built AWS EC2 images (AMIs) optimised for ECS, so first you'll need to start a new EC2 instance running this image.
+AWS provides pre-built AWS EC2 images (AMIs) optimised for ECS, but before we launch one of these images, we'll need to ensure we have the permissions we need to use EC2 and ECS together. To do this, we first need to create an `ecsInstanceRole`. Follow the abridged steps below or goto [AWS Docs for full instructions](http://docs.aws.amazon.com/AmazonECS/latest/developerguide/instance_IAM_role.html).
+
+#### Create `ecsInstanceRole` IAM Role
+
+1. To create the `ecsInstanceRole` IAM role for your container instances
+
+2. Open the Identity and Access Management (IAM) console at https://console.aws.amazon.com/iam/.
+
+3. In the navigation pane, choose Roles and then choose Create New Role.
+
+4. In the Role Name field, type ecsInstanceRole to name the role, and then choose Next Step.
+
+5. In the Select Role Type section, choose Select next to the Amazon EC2 Role for EC2 Container Service role.
+
+6. In the Attach Policy section, select the AmazonEC2ContainerServiceforEC2Role policy and then choose Next Step.
+
+Review your role information and then choose Create Role to finish.
+
+#### Add Trust relationship between new role and EC2
+
+1. Open the Identity and Access Management (IAM) console at https://console.aws.amazon.com/iam/.
+
+2. In the navigation pane, choose Roles.
+
+3. Choose the Permissions tab.
+
+4. In the Managed Policies section, ensure that the AmazonEC2ContainerServiceforEC2Role managed policy is attached to the role. If the policy is attached, your Amazon ECS instance role is properly configured. If not, follow the substeps below to attach the policy.
+
+5. Choose Attach Policy.
+
+6. In the Filter box, type AmazonEC2ContainerServiceforEC2Role to narrow the available policies to attach.
+
+7. Check the box to the left of the AmazonEC2ContainerServiceforEC2Role policy and choose Attach Policy.
+
+8. Choose the Trust Relationships tab, and Edit Trust Relationship.
+
+9. Verify that the trust relationship contains the following policy. If the trust relationship matches the policy below, choose Cancel. If the trust relationship does not match, copy the policy into the Policy Document window and choose Update Trust Policy.
+
+{
+  "Version": "2008-10-17",
+  "Statement": [
+    {
+      "Sid": "",
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "ec2.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+
+#### Create your EC2 instance for use with ECS
 
 1. Goto the AWS EC2 console and select `Launch instance`.
 2. Click `Community AMIs`.
 3. Search for `ecs-optimized`.
 4. Pick the latest image listed.
-5. Choose your instance size, t2.micro will be enough for a demo application.
-6. Ensure you open appropriate ports like `80`, `22` etc so you can access the instance. Tag the instance so you can easily find it in your console.
-7. Launch instance
+5. Choose your instance size, t2.micro will be enough for a demo application. Click next.
+6. In the Instance Configuration details, **Ensure you've added the `ecsInstanceRole` as the IAM Role**. (If this is not visible, see instructions above).
+7. Ensure you open appropriate ports like `80`, `22` etc so you can access the instance. Tag the instance so you can easily find it in your console.
+8. Launch instance
 
 Once your instance has started and is ready to use, navigate to the AWS EC2 Container Services console.
 
-If this is your first time using ECS, the newly created instance should also create a `default` Cluster. If not, you will need to configure a new cluster, it can be called whatever you like.
+By default, these instances join the EC2 Container Service cluster named `default`. You can use a different cluster, but the instance will have to be configured, [see the AWS documentation](http://docs.aws.amazon.com/AmazonECS/latest/developerguide/launch_container_instance.html) for more details.
+
+If your new EC2 instance has started and is ready, you should see the `default` cluster available. 
 
 #### AWS Docker Repository
 To make this process more integrated, AWS also provides a provide Docker repository to upload your images. This will feed into the build process as it is where our built Chat docker image has to be uploaded before it is deployed.
