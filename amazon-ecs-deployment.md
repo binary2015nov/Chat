@@ -99,6 +99,7 @@ Once running, any other docker appications running in `bridge` with specified `V
 ## Building your Docker image
 To build a docker image, your application will need a `Dockerfile` in your repository. For this process, we use the Dockerfile to build your application into the Docker image itself. For example,
 
+##### Dockerfile
 ``` Dockerfile
 FROM microsoft/dotnet:latest
 COPY src/Chat /app
@@ -121,6 +122,7 @@ Once this is done, you'll be presented with a help screen that shows you how to 
 ## Automate deployment of your .NET Core application to ECS
 In this example, we are using Travis CI to build and build our Docker image to our Amzon Elastic Container Repository (ECR). Travis CI is driven off a `.travis.yml` file in the root of the GitHub repository, below is an example of the Beta support for building .NET Core applications on Travis CI.
 
+##### .travis.yml
 ``` yaml
 sudo: required
 language: csharp
@@ -156,6 +158,7 @@ We also include a `build.sh` and a `deploy.sh` which are already setup to build 
 
 For example, the Chat application uses the following configuration. 
 
+##### set-envs.sh
 ``` shell
 #!/bin/bash
 
@@ -174,6 +177,8 @@ export ECS_TASK=$IMAGE_NAME-task
 
 ## Configuring your application container
 AWS ECS defines contains via a `task-definition`, in the `deploy.sh` we perform a token replacement via the bash util `sed` for some of the environment variables above so that the only custom settings are related to the container and the host. Settings such as memory, cpu, ports and task specific environment variables such as `VIRTUAL_HOST`, `VIRTUAL_PORT`. For example,
+
+##### task-definition.json
 
 ``` json
 {
@@ -212,6 +217,7 @@ The `portMappings` `hostPort` is important as this should be unique per applicat
 
 Which leaves the `build.sh` and the `deploy.sh`. `build.sh` sets the configuration via `set-envs` and builds the docker image.
 
+##### build.sh
 ``` build.sh
 #!/bin/bash
 source ./set-envs.sh
@@ -221,8 +227,10 @@ docker build -t $IMAGE_NAME .
 docker tag $IMAGE_NAME $AWS_ECS_REPO_DOMAIN/$IMAGE_NAME:$IMAGE_VERSION
 ```
 
+
 The `deploy.sh` contains the logic for deploying to the `default` ECS cluster and should (like `build.sh`) live at the root of your application's repository.
 
+##### deploy.sh
 ``` deploy.sh
 #!/bin/bash
 source ./set-envs.sh
