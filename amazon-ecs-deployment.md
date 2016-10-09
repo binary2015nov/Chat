@@ -172,4 +172,91 @@ export ECS_SERVICE=$IMAGE_NAME-service
 export ECS_TASK=$IMAGE_NAME-task
 ```
 
+## Configuring your application container
+AWS ECS defines contains via a `task-definition`, in the `deploy.sh` we perform a token replacement via the bash util `sed` for some of the environment variables above so that the only custom settings are related to the container and the host. Settings such as memory, cpu, ports and task specific environment variables such as `VIRTUAL_HOST`, `VIRTUAL_PORT`. For example,
 
+``` json
+{
+    "family": "__ECS_TASK__",
+    "networkMode": "bridge",
+    "containerDefinitions": [
+        {
+            "image": "__AWS_ECS_REPO_DOMAIN__/__IMAGE_NAME__:__IMAGE_VERSION__",
+            "name": "__IMAGE_NAME__-container",
+            "cpu": 128,
+            "memory": 256,
+            "essential": true,
+            "portMappings": [
+                {
+                    "containerPort": 5000,
+                    "hostPort": 5000,
+                    "protocol": "tcp"
+                }
+            ],
+            "environment": [
+                {
+                    "name": "VIRTUAL_HOST",
+                    "value": "chat.layoric.org"
+                },
+                {
+                    "name": "VIRTUAL_PORT",
+                    "value": "5000"
+                }
+            ]
+        }
+    ]
+}
+```
+
+The `portMappings` `hostPort` is important as this should be unique per application (ECS service) deployed to your cluster. 
+
+Which leaves the `build.sh` and the `deploy.sh`. `build.sh` sets the configuration via `set-envs` and builds the docker image.
+
+``` build.sh
+#!/bin/bash
+source ./set-envs.sh
+
+# Build process
+docker build -t $IMAGE_NAME .
+docker tag $IMAGE_NAME $AWS_ECS_REPO_DOMAIN/$IMAGE_NAME:$IMAGE_VERSION
+```
+
+The `deploy.sh` contains the logic for deploying to the `default` ECS cluster and should (like `build.sh`) live at the root of your application's repository.
+
+``` deploy.sh
+#!/bin/bash
+source ./set-envs.sh
+
+# Update task definition with env values
+sed "s/__ECS_TASK__/$ECS_TASK/g" -i ./task-definition.json
+sed "s/__IMAGE_NAME__/$IMAGE_NAME/g" -i ./task-definition.json
+sed "s/__AWS_ECS_REPO_DOMAIN__/$AWS_ECS_REPO_DOMAIN/g" -i ./task-definition.json
+sed "s/__IMAGE_VERSION__/$IMAGE_VERSION/g" -i ./task-definition.json
+
+# install dependencies
+sudo apt-get install jq #install jq for json parsing
+pip install --user awscli # install aws cli w/o sudo
+export PATH=$PATH:$HOME/.local/bin # put aws in the path
+
+eval $(aws ecr get-login --region $AWS_DEFAULT_REGION) #needs AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY envvars
+docker push $AWS_ECS_REPO_DOMAIN/$IMAGE_NAME:$IMAGE_VERSION
+aws ecs register-task-definition --cli-input-json file://task-definition.json --region $AWS_DEFAULT_REGION > /dev/null # Create a new task revision
+TASK_REVISION=$(aws ecs describe-task-definition --task-definition $ECS_TASK --region $AWS_DEFAULT_REGION | jq '.taskDefinition.revision') #get latest revision
+SERVICE_ARN="arn:aws:ecs:$AWS_DEFAULT_REGION:$AWS_ACCOUNT_NUMBER:service/$ECS_SERVICE"
+ECS_SERVICE_EXISTS=$(aws ecs list-services --region $AWS_DEFAULT_REGION --cluster $AWS_ECS_CLUSTER_NAME | jq '.serviceArns' | jq 'contains(["'"$SERVICE_ARN"'"])')
+if [ "$ECS_SERVICE_EXISTS" == "true" ]; then
+    echo "ECS Service already exists"
+    aws ecs update-service --cluster $AWS_ECS_CLUSTER_NAME --service $ECS_SERVICE --task-definition "$ECS_TASK:$TASK_REVISION" --desired-count 1 --region $AWS_DEFAULT_REGION > /dev/null #update service with latest task revision
+else
+    echo "Creating ECS Service $ECS_SERVICE"
+    aws ecs create-service --cluster $AWS_ECS_CLUSTER_NAME --service-name $ECS_SERVICE --task-definition "$ECS_TASK:$TASK_REVISION" --desired-count 1 --region $AWS_DEFAULT_REGION > /dev/null #create service
+fi
+if [ "$(aws ecs list-tasks --service-name $ECS_SERVICE --region $AWS_DEFAULT_REGION | jq '.taskArns' | jq 'length')" -gt "0" ]; then
+    TEMP_ARN=$(aws ecs list-tasks --service-name $ECS_SERVICE --region $AWS_DEFAULT_REGION | jq '.taskArns[0]') # Get current running task ARN
+    TASK_ARN="${TEMP_ARN%\"}" # strip double quotes
+    TASK_ARN="${TASK_ARN#\"}" # strip double quotes
+    aws ecs stop-task --task $TASK_ARN --region $AWS_DEFAULT_REGION > /dev/null # Stop current task to force start of new task revision with new image
+fi
+```
+
+Now every commit will trigger a `build.sh` to run on Travis CI and every commit to master will build, push and deploy your application's new docker image.
