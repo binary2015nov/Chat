@@ -16,37 +16,38 @@ AWS provides pre-built AWS EC2 images (AMIs) optimised for ECS, but before we la
 
 1. To create the `ecsInstanceRole` IAM role for your container instances
 
-2. Open the Identity and Access Management (IAM) console at https://console.aws.amazon.com/iam/.
+2. Open the Identity and Access Management (IAM) console at https://console.aws.amazon.com/iam/
 
-3. In the navigation pane, choose Roles and then choose Create New Role.
+3. In the navigation pane, choose Roles and then choose **Create New Role**
 
-4. In the Role Name field, type ecsInstanceRole to name the role, and then choose Next Step.
+4. In the Role Name field, type `ecsInstanceRole` to name the role, and then choose **Next Step**
 
-5. In the Select Role Type section, choose Select next to the Amazon EC2 Role for EC2 Container Service role.
+5. In the Select Role Type section, choose **Select** on the right of the **Amazon EC2** Role for EC2 Container Service role
 
-6. In the Attach Policy section, select the AmazonEC2ContainerServiceforEC2Role policy and then choose Next Step.
+6. In the Attach Policy section, select the `AmazonEC2ContainerServiceforEC2Role` policy and then choose **Next Step**
 
 Review your role information and then choose Create Role to finish.
 
 #### Add Trust relationship between new role and EC2
 
-1. Open the Identity and Access Management (IAM) console at https://console.aws.amazon.com/iam/.
+1. Open the Identity and Access Management (IAM) console at: https://console.aws.amazon.com/iam/
 
-2. In the navigation pane, choose Roles.
+2. In the navigation pane, choose **Roles**
 
-3. Choose the Permissions tab.
+3. Choose the **Permissions** tab
 
-4. In the Managed Policies section, ensure that the AmazonEC2ContainerServiceforEC2Role managed policy is attached to the role. If the policy is attached, your Amazon ECS instance role is properly configured. If not, follow the substeps below to attach the policy.
+4. In the Managed Policies section, ensure that the `AmazonEC2ContainerServiceforEC2Role` managed policy is attached to the role. If the policy is attached, your Amazon ECS instance role is properly configured. If not, follow the substeps below to attach the policy.
 
-5. Choose Attach Policy.
+5. Choose **Attach Policy**
 
-6. In the Filter box, type AmazonEC2ContainerServiceforEC2Role to narrow the available policies to attach.
+6. In the Filter box, type `AmazonEC2ContainerServiceforEC2Role` to narrow the available policies to attach
 
-7. Check the box to the left of the AmazonEC2ContainerServiceforEC2Role policy and choose Attach Policy.
+7. Check the box to the left of the `AmazonEC2ContainerServiceforEC2Role` policy and choose **Attach Policy**
 
-8. Choose the Trust Relationships tab, and Edit Trust Relationship.
+8. Choose the **Trust Relationships** tab, and **Edit Trust Relationship**
 
-9. Verify that the trust relationship contains the following policy. If the trust relationship matches the policy below, choose Cancel. If the trust relationship does not match, copy the policy into the Policy Document window and choose Update Trust Policy.
+9. Verify that the trust relationship contains the following policy. If the trust relationship matches the policy below, choose **Cancel**. If the trust relationship does not match, copy the policy into the Policy Document window and choose **Update Trust Policy**.
+
 ``` json
 {
   "Version": "2008-10-17",
@@ -63,7 +64,7 @@ Review your role information and then choose Create Role to finish.
 }
 ```
 
-To push docker images, we'll also need an IAM account with the following permissions by [attaching the following policies to a IAM user](https://console.aws.amazon.com/iam/home).
+To push docker images, we'll also need an IAM account with the following permissions by [attaching the following policies to a IAM user](https://console.aws.amazon.com/iam/home):
  
  - AmazonEC2ContainerRegistryFullAccess
  - AmazonEC2ContainerServiceFullAccess
@@ -71,14 +72,15 @@ To push docker images, we'll also need an IAM account with the following permiss
 
 #### Create your EC2 instance for use with ECS
 
-1. Goto the AWS EC2 console and select `Launch instance`.
-2. Click `Community AMIs`.
-3. Search for `ecs-optimized`.
-4. Pick the latest image listed.
-5. Choose your instance size, t2.micro will be enough for a demo application. Click next.
-6. In the Instance Configuration details, **Ensure you've added the `ecsInstanceRole` as the IAM Role**. (If this is not visible, see instructions above).
-7. Ensure you open appropriate ports like `80`, `22` etc so you can access the instance. Tag the instance so you can easily find it in your console.
-8. Launch instance
+ 1. Goto the [AWS EC2 console](https://console.aws.amazon.com/ec2/v2/home) and select **Launch instance**
+ 2. Click **AWS Marketplace**
+ 3. Search for `ecs-optimized`
+ 4. Select the **Amazon ECS-Optimized Amazon Linux AMI**
+ 5. Select your preferred instance size, **t2.micro** will be enough for a demo application. Click **Next: Configure Instance Details**
+ 6. In the Instance Configuration details, **Ensure you've added the `ecsInstanceRole` as the IAM Role**. (If this is not visible, see instructions above)
+ 7. In the **Tag Instance** tab you can tag the instance so you can easily find it in your **AWS EC2 Console**
+ 8. In the **Configure Security Group** tab ensure you open appropriate ports like SSH (22), HTTP (80), HTTPS (443), etc that you want to access the instance with. 
+ 9. Click **Review and Launch**, double-check your Instance details then click **Launch** to Launch your instance
 
 Once your instance has started and is ready to use, navigate to the AWS EC2 Container Services console.
 
