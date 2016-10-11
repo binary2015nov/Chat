@@ -18,7 +18,7 @@
             "environment": [
                 {
                     "name": "VIRTUAL_HOST",
-                    "value": "netcore.io"
+                    "value": "chat.netcore.io"
                 },
                 {
                     "name": "VIRTUAL_PORT",
