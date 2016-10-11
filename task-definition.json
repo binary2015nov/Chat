@@ -18,7 +18,7 @@
             "environment": [
                 {
                     "name": "VIRTUAL_HOST",
-                    "value": "chat.layoric.org"
+                    "value": "netcore.io"
                 },
                 {
                     "name": "VIRTUAL_PORT",
