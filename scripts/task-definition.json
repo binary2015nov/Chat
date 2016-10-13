@@ -11,7 +11,7 @@
             "portMappings": [
                 {
                     "containerPort": 5000,
-                    "hostPort": ${AWS_ECS_HOST_PORT},
+                    "hostPort": 0,
                     "protocol": "tcp"
                 }
             ],
@@ -19,10 +19,6 @@
                 {
                     "name": "VIRTUAL_HOST",
                     "value": "${AWS_VIRTUAL_HOST}"
-                },
-                {
-                    "name": "VIRTUAL_PORT",
-                    "value": "${AWS_ECS_HOST_PORT}"
                 }
             ]
         }
