@@ -4,11 +4,12 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
-using Funq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Funq;
 using ServiceStack;
 using ServiceStack.Auth;
 using ServiceStack.Configuration;
@@ -16,10 +17,23 @@ using ServiceStack.Mvc;
 
 namespace Chat
 {
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            var host = new WebHostBuilder()
+                .UseKestrel()
+                .UseContentRoot(Directory.GetCurrentDirectory())
+                .UseIISIntegration()
+                .UseStartup<Startup>()
+                .Build();
+
+            host.Run();
+        }
+    }
+
     public class Startup
     {
-        // This method gets called by the runtime. Use this method to add services to the container.
-        // For more information on how to configure your application, visit http://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
@@ -76,7 +90,7 @@ namespace Chat
                 new IAuthProvider[] {
                     new TwitterAuthProvider(AppSettings),   //Sign-in with Twitter
                     new FacebookAuthProvider(AppSettings),  //Sign-in with Facebook
-                    new GithubAuthProvider(AppSettings),    //Sign-in with GitHub OAuth Provider
+                    new GithubAuthProvider(AppSettings),    //Sign-in with GitHub
                 }));
 
             container.RegisterAutoWiredAs<MemoryChatHistory, IChatHistory>();
