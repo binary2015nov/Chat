@@ -65,6 +65,7 @@ namespace Chat
         {
             Plugins.Add(new RazorFormat());
             Plugins.Add(new ServerEventsFeature());
+            Plugins.Add(new RequestLogsFeature());
 
             SetConfig(new HostConfig {
                 DefaultContentType = MimeTypes.Json,
