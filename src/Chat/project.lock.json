@@ -1972,13 +1972,13 @@
           "lib/netstandard1.6/ServiceStack.Mvc.dll": {}
         }
       },
-      "ServiceStack.Redis.Core/1.0.19": {
+      "ServiceStack.Redis.Core/1.0.20": {
         "type": "package",
         "dependencies": {
           "NETStandard.Library": "1.6.0",
-          "ServiceStack.Common.Core": "1.0.19",
-          "ServiceStack.Interfaces.Core": "1.0.19",
-          "ServiceStack.Text.Core": "1.0.19",
+          "ServiceStack.Common.Core": "1.0.20",
+          "ServiceStack.Interfaces.Core": "1.0.20",
+          "ServiceStack.Text.Core": "1.0.20",
           "System.Collections.NonGeneric": "4.0.1",
           "System.Collections.Specialized": "4.0.1",
           "System.Net.NameResolution": "4.0.0",
@@ -5758,12 +5758,12 @@
         "lib/netstandard1.6/ServiceStack.Mvc.pdb"
       ]
     },
-    "ServiceStack.Redis.Core/1.0.19": {
-      "sha512": "P/bDRopq7mEpt76TTGUMFotUajSvSEK1VJg+iSfOmSmL9yB7IauJ2GfDrCumkUEmXzI+aU7qAawXM3ykJ6pXow==",
+    "ServiceStack.Redis.Core/1.0.20": {
+      "sha512": "Zb77anhlD940wHDHLb8eL4AIM/HgHqsbfAi5WSAxrqmkpMtywJVD0nn02kO3p2MvqUXcWuYQXLPRxKmAq2U6EA==",
       "type": "package",
-      "path": "ServiceStack.Redis.Core/1.0.19",
+      "path": "ServiceStack.Redis.Core/1.0.20",
       "files": [
-        "ServiceStack.Redis.Core.1.0.19.nupkg.sha512",
+        "ServiceStack.Redis.Core.1.0.20.nupkg.sha512",
         "ServiceStack.Redis.Core.nuspec",
         "lib/netstandard1.3/ServiceStack.Redis.deps.json",
         "lib/netstandard1.3/ServiceStack.Redis.dll",
