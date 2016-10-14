@@ -1,0 +1,15 @@
+DebugMode True
+
+oauth.RedirectUrl http://chat.netcore.io/
+oauth.CallbackUrl http://chat.netcore.io/auth/{0}
+
+oauth.twitter.ConsumerKey DoaAqKbo4xFkAh2Mr0edPsh3j
+oauth.twitter.ConsumerSecret 1DlbJZ2QJr2AhS1mKT34WBBtFbpp49FELUdDZ8ZziOJ13heOPZ
+
+oauth.facebook.Permissions email,read_stream
+oauth.facebook.AppId 316911901802572
+oauth.facebook.AppSecret b5a1f473df632f149d88c3629dda851d
+
+oauth.github.Scopes user
+oauth.github.ClientId 3cf23c262e7e24f6a7d6
+oauth.github.ClientSecret f671d602196aca39a0615cd1e625edf4a6af7652
