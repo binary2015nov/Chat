@@ -6,7 +6,7 @@ oauth.CallbackUrl http://chat.netcore.io/auth/{0}
 oauth.twitter.ConsumerKey DoaAqKbo4xFkAh2Mr0edPsh3j
 oauth.twitter.ConsumerSecret 1DlbJZ2QJr2AhS1mKT34WBBtFbpp49FELUdDZ8ZziOJ13heOPZ
 
-oauth.facebook.Permissions email,read_stream
+oauth.facebook.Permissions email
 oauth.facebook.AppId 920384324772801
 oauth.facebook.AppSecret 01bbe73170a49ae9501a62ac70ef1898
 
