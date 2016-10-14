@@ -4,18 +4,16 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
-using System.Threading.Tasks;
 using Funq;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ServiceStack;
 using ServiceStack.Auth;
 using ServiceStack.Configuration;
-using ServiceStack.Redis;
-using ServiceStack.Text;
+using ServiceStack.Host.Handlers;
+using ServiceStack.Mvc;
 
 namespace Chat
 {
@@ -25,6 +23,7 @@ namespace Chat
         // For more information on how to configure your application, visit http://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddMvc();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -37,12 +36,18 @@ namespace Chat
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseStaticFiles();
+
             app.UseServiceStack(new AppHost());
 
-            app.Run(async (context) =>
+            app.UseMvc(routes =>
             {
-                await context.Response.WriteAsync("Hello World!");
+                routes.MapRoute(
+                    name: "default",
+                    template: "{controller=Home}/{action=Index}/{id?}");
             });
+
+            app.Use(new RequestInfoHandler());
         }
     }
 
@@ -50,7 +55,7 @@ namespace Chat
     {
         public AppHost() : base("Chat", typeof(ServerEventsServices).GetTypeInfo().Assembly)
         {
-            var liveSettings = "~/appsettings.txt".MapHostAbsolutePath();
+            var liveSettings = MapProjectPath("~/appsettings.txt");
             AppSettings = File.Exists(liveSettings)
                 ? (IAppSettings)new TextFileSettings(liveSettings)
                 : new AppSettings();
@@ -58,12 +63,14 @@ namespace Chat
 
         public override void Configure(Container container)
         {
+            Plugins.Add(new RazorFormat());
             Plugins.Add(new ServerEventsFeature());
-            SetConfig(new HostConfig
-            {
+
+            SetConfig(new HostConfig {
                 DefaultContentType = MimeTypes.Json,
                 AllowSessionIdsInHttpParams = true,
             });
+
             this.CustomErrorHttpHandlers.Remove(HttpStatusCode.Forbidden);
 
             //Register all Authentication methods you want to enable for this web app.            
