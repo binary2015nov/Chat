@@ -12,7 +12,6 @@ using Microsoft.Extensions.Logging;
 using ServiceStack;
 using ServiceStack.Auth;
 using ServiceStack.Configuration;
-using ServiceStack.Host.Handlers;
 using ServiceStack.Mvc;
 
 namespace Chat
@@ -46,8 +45,6 @@ namespace Chat
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
-
-            app.Use(new RequestInfoHandler());
         }
     }
 
@@ -65,7 +62,6 @@ namespace Chat
         {
             Plugins.Add(new RazorFormat());
             Plugins.Add(new ServerEventsFeature());
-            Plugins.Add(new RequestLogsFeature());
 
             SetConfig(new HostConfig {
                 DefaultContentType = MimeTypes.Json,
