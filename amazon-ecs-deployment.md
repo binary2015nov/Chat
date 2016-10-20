@@ -140,10 +140,10 @@ matrix:
       mono: none
       env: DOTNETCORE=1
 script:
-  - chmod +x ./set-envs.sh
-  - chmod +x ./build.sh
-  - chmod +x ./deploy.sh
-  - ./build.sh
+  - chmod +x ./deploy-envs.sh
+  - chmod +x ./scripts/build.sh
+  - chmod +x ./scripts/deploy.sh
+  - cd scripts && ./build.sh
   - if [ "$TRAVIS_BRANCH" == "master" ]; then ./deploy.sh; fi
 ```
 The above script it using a `matrix` of one initially just using ubuntu to build the docker .NET Core application, but this could be expanded to include other operating systems by adding to the `matrix` in the future.
@@ -156,25 +156,27 @@ The environment variables that need to be set are:
  - `AWS_SECRET_ACCESS_KEY` (from the IAM account created above)
  - `AWS_ACCOUNT_NUMBER` (used for generating correct ECR URL for pushing docker images)
  
-We also include a `build.sh` and a `deploy.sh` which are already setup to build and deploy a .NET Core application given your specific application build and deploy config set in `set-envs.sh` file.
+We also include a `build.sh` and a `deploy.sh` which are already setup to build and deploy a .NET Core application given your specific application build and deploy config set in `deploy-envs.sh` file.
+
+To use these scripts for yourself, start with the following steps.
+1. Copy the `build` directory to the root of your repository
+2. Copy and modify the `Dockerfile` to build your application docker image
+3. Copy and modify the `.travis.yml` file to run your build process (ie, point at your `.sln` file).
+4. Copy and modify the `deploy-envs.sh` file to name the docker image and AWS ECS image repository yourself.
 
 For example, the Chat application uses the following configuration. 
 
-##### set-envs.sh
+##### deploy-envs.sh
 ``` shell
 #!/bin/bash
 
 # Set variables
 export IMAGE_NAME=netcoreapps-chat
 export IMAGE_VERSION=latest
-
-export AWS_DEFAULT_REGION=ap-southeast-2
+export AWS_DEFAULT_REGION=us-east-1
 export AWS_ECS_CLUSTER_NAME=default
-#AWS_ACCOUNT_NUMBER={} set in private variable
-export AWS_ECS_REPO_DOMAIN=$AWS_ACCOUNT_NUMBER.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
 
-export ECS_SERVICE=$IMAGE_NAME-service
-export ECS_TASK=$IMAGE_NAME-task
+export AWS_VIRTUAL_HOST=chat.netcore.io
 ```
 
 ## Configuring your application container
@@ -217,15 +219,18 @@ AWS ECS defines contains via a `task-definition`, in the `deploy.sh` we perform 
 
 The `portMappings` `hostPort` is important as this should be unique per application (ECS service) deployed to your cluster. 
 
-Which leaves the `build.sh` and the `deploy.sh`. `build.sh` sets the configuration via `set-envs` and builds the docker image.
+Which leaves the `build.sh` and the `deploy.sh`. `build.sh` sets the configuration via `deploy-envs` and builds the docker image.
 
 ##### build.sh
 ``` build.sh
 #!/bin/bash
-source ./set-envs.sh
+source ../deploy-envs.sh
+
+#AWS_ACCOUNT_NUMBER={} set in private variable
+export AWS_ECS_REPO_DOMAIN=$AWS_ACCOUNT_NUMBER.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
 
 # Build process
-docker build -t $IMAGE_NAME .
+docker build -t $IMAGE_NAME ../
 docker tag $IMAGE_NAME $AWS_ECS_REPO_DOMAIN/$IMAGE_NAME:$IMAGE_VERSION
 ```
 
@@ -235,30 +240,33 @@ The `deploy.sh` contains the logic for deploying to the `default` ECS cluster an
 ##### deploy.sh
 ``` deploy.sh
 #!/bin/bash
-source ./set-envs.sh
+source ../deploy-envs.sh
 
-# Update task definition with env values
-sed "s/__ECS_TASK__/$ECS_TASK/g" -i ./task-definition.json
-sed "s/__IMAGE_NAME__/$IMAGE_NAME/g" -i ./task-definition.json
-sed "s/__AWS_ECS_REPO_DOMAIN__/$AWS_ECS_REPO_DOMAIN/g" -i ./task-definition.json
-sed "s/__IMAGE_VERSION__/$IMAGE_VERSION/g" -i ./task-definition.json
+#AWS_ACCOUNT_NUMBER={} set in private variable
+export AWS_ECS_REPO_DOMAIN=$AWS_ACCOUNT_NUMBER.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
+export ECS_SERVICE=$IMAGE_NAME-service
+export ECS_TASK=$IMAGE_NAME-task
 
 # install dependencies
-sudo apt-get install jq #install jq for json parsing
+sudo apt-get install jq -y #install jq for json parsing
+sudo apt-get install gettext -y 
 pip install --user awscli # install aws cli w/o sudo
 export PATH=$PATH:$HOME/.local/bin # put aws in the path
 
+# replace environment variables in task-definition
+envsubst < task-definition.json > new-task-definition.json
+
 eval $(aws ecr get-login --region $AWS_DEFAULT_REGION) #needs AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY envvars
 docker push $AWS_ECS_REPO_DOMAIN/$IMAGE_NAME:$IMAGE_VERSION
-aws ecs register-task-definition --cli-input-json file://task-definition.json --region $AWS_DEFAULT_REGION > /dev/null # Create a new task revision
+aws ecs register-task-definition --cli-input-json file://new-task-definition.json --region $AWS_DEFAULT_REGION > /dev/null # Create a new task revision
 TASK_REVISION=$(aws ecs describe-task-definition --task-definition $ECS_TASK --region $AWS_DEFAULT_REGION | jq '.taskDefinition.revision') #get latest revision
 SERVICE_ARN="arn:aws:ecs:$AWS_DEFAULT_REGION:$AWS_ACCOUNT_NUMBER:service/$ECS_SERVICE"
 ECS_SERVICE_EXISTS=$(aws ecs list-services --region $AWS_DEFAULT_REGION --cluster $AWS_ECS_CLUSTER_NAME | jq '.serviceArns' | jq 'contains(["'"$SERVICE_ARN"'"])')
 if [ "$ECS_SERVICE_EXISTS" == "true" ]; then
-    echo "ECS Service already exists"
+    echo "ECS Service already exists, Updating $ECS_SERVICE ..."
     aws ecs update-service --cluster $AWS_ECS_CLUSTER_NAME --service $ECS_SERVICE --task-definition "$ECS_TASK:$TASK_REVISION" --desired-count 1 --region $AWS_DEFAULT_REGION > /dev/null #update service with latest task revision
 else
-    echo "Creating ECS Service $ECS_SERVICE"
+    echo "Creating ECS Service $ECS_SERVICE ..."
     aws ecs create-service --cluster $AWS_ECS_CLUSTER_NAME --service-name $ECS_SERVICE --task-definition "$ECS_TASK:$TASK_REVISION" --desired-count 1 --region $AWS_DEFAULT_REGION > /dev/null #create service
 fi
 if [ "$(aws ecs list-tasks --service-name $ECS_SERVICE --region $AWS_DEFAULT_REGION | jq '.taskArns' | jq 'length')" -gt "0" ]; then
