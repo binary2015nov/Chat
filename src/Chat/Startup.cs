@@ -77,7 +77,8 @@ namespace Chat
             Plugins.Add(new RazorFormat());
             Plugins.Add(new ServerEventsFeature());
 
-            SetConfig(new HostConfig {
+            SetConfig(new HostConfig
+            {
                 DefaultContentType = MimeTypes.Json,
                 AllowSessionIdsInHttpParams = true,
             });
@@ -94,7 +95,7 @@ namespace Chat
                 }));
 
             container.RegisterAutoWiredAs<MemoryChatHistory, IChatHistory>();
-            
+
             // for lte IE 9 support
             Plugins.Add(new CorsFeature());
         }
@@ -107,6 +108,8 @@ namespace Chat
         void Log(string channel, ChatMessage msg);
 
         List<ChatMessage> GetRecentChatHistory(string channel, long? afterId, int? take);
+
+        void Flush();
     }
 
     public class MemoryChatHistory : IChatHistory
@@ -148,6 +151,11 @@ namespace Chat
                           .Reverse(); //reverse back
 
             return ret.ToList();
+        }
+
+        public void Flush()
+        {
+            MessagesMap = new Dictionary<string, List<ChatMessage>>();
         }
     }
 
@@ -196,6 +204,9 @@ namespace Chat
         public List<ChatMessage> Results { get; set; }
         public ResponseStatus ResponseStatus { get; set; }
     }
+
+    [Route("/reset")]
+    public class ClearChatHistory : IReturnVoid { }
 
     public class ServerEventsServices : Service
     {
@@ -287,6 +298,12 @@ namespace Chat
             {
                 Results = msgs
             };
+        }
+
+        public object Any(ClearChatHistory request)
+        {
+            ChatHistory.Flush();
+            return HttpResult.Redirect("/");
         }
     }
 
