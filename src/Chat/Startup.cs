@@ -211,6 +211,9 @@ namespace Chat
     [Route("/reset")]
     public class ClearChatHistory : IReturnVoid { }
 
+    [Route("/reset-serverevents")]
+    public class ResetServerEvents : IReturnVoid { }
+
     public class ServerEventsServices : Service
     {
         public IServerEvents ServerEvents { get; set; }
@@ -308,6 +311,11 @@ namespace Chat
         {
             ChatHistory.Flush();
             return HttpResult.Redirect("/");
+        }
+
+        public void Any(ResetServerEvents request)
+        {
+            ServerEvents.Reset();
         }
     }
 
