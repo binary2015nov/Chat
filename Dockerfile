@@ -1,4 +1,4 @@
-FROM microsoft/dotnet:1.1-sdk-projectjson
+FROM microsoft/dotnet:latest
 COPY src/Chat /app
 COPY src/Chat/deploy /app
 WORKDIR /app
