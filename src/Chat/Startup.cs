@@ -25,6 +25,7 @@ namespace Chat
                 .UseKestrel()
                 .UseContentRoot(Directory.GetCurrentDirectory())
                 .UseIISIntegration()
+                .UseUrls("http://0.0.0.0:5000/")
                 .UseStartup<Startup>()
                 .Build();
 
