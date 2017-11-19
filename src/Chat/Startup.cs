@@ -5,8 +5,10 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Funq;
@@ -21,20 +23,20 @@ namespace Chat
     {
         public static void Main(string[] args)
         {
-            var host = new WebHostBuilder()
-                .UseKestrel()
-                .UseContentRoot(Directory.GetCurrentDirectory())
-                .UseIISIntegration()
-                .UseUrls("http://0.0.0.0:5000/")
+            BuildWebHost(args).Run();
+        }
+
+        public static IWebHost BuildWebHost(string[] args) =>
+            WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>()
                 .Build();
-
-            host.Run();
-        }
     }
 
     public class Startup
     {
+        IConfiguration Configuration { get; set; }
+        public Startup(IConfiguration configuration) => Configuration = configuration;
+
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
@@ -52,7 +54,9 @@ namespace Chat
 
             app.UseStaticFiles();
 
-            app.UseServiceStack(new AppHost());
+            app.UseServiceStack(new AppHost {
+                AppSettings = new NetCoreAppSettings(Configuration)
+            });
 
             app.UseMvc(routes =>
             {
