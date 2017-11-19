@@ -1,6 +1,5 @@
 FROM microsoft/dotnet:2.0-sdk
 COPY src/Chat /app
-COPY src/Chat/deploy /app
 WORKDIR /app
 RUN ["dotnet", "restore", "--configfile", "NuGet.Config"]
 RUN ["dotnet", "build"]
