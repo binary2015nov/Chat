@@ -19,10 +19,6 @@
                 {
                     "name": "VIRTUAL_HOST",
                     "value": "${AWS_VIRTUAL_HOST}"
-                },
-                {
-                    "name": "ASPNETCORE_URLS",
-                    "value": "https://*:5000"
                 }
             ]
         }
