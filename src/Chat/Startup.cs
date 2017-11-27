@@ -13,6 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Funq;
 using ServiceStack;
+using ServiceStack.Configuration;
 using ServiceStack.Auth;
 using ServiceStack.Mvc;
 
