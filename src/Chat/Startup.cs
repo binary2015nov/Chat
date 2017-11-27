@@ -14,7 +14,6 @@ using Microsoft.Extensions.Logging;
 using Funq;
 using ServiceStack;
 using ServiceStack.Auth;
-using ServiceStack.Configuration;
 using ServiceStack.Mvc;
 
 namespace Chat
