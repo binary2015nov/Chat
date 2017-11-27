@@ -69,13 +69,7 @@ namespace Chat
 
     public class AppHost : AppHostBase
     {
-        public AppHost() : base("Chat", typeof(ServerEventsServices).GetTypeInfo().Assembly)
-        {
-            var liveSettings = MapProjectPath("~/appsettings.txt");
-            AppSettings = File.Exists(liveSettings)
-                ? (IAppSettings)new TextFileSettings(liveSettings)
-                : new AppSettings();
-        }
+        public AppHost() : base("Chat", typeof(ServerEventsServices).GetTypeInfo().Assembly) {}
 
         public override void Configure(Container container)
         {
