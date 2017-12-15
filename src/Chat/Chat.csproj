@@ -6,36 +6,18 @@
     <PackageId>Chat</PackageId>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <NoWarn />
-  </PropertyGroup>
-
   <ItemGroup>
-    <None Update="wwwroot\**\*">
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </None>
+    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.0" />
+
+    <Reference Include="..\..\lib\ServiceStack.Text.dll" />
+    <Reference Include="..\..\lib\ServiceStack.Interfaces.dll" />
+    <Reference Include="..\..\lib\ServiceStack.Client.dll" />
+    <Reference Include="..\..\lib\ServiceStack.Common.dll" />
+    <Reference Include="..\..\lib\ServiceStack.dll" />
+    <Reference Include="..\..\lib\ServiceStack.Mvc.dll" />
+    <Reference Include="..\..\lib\ServiceStack.Redis.dll" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.3" />
-
-    <Reference Include="..\..\..\lib\ServiceStack.Text.dll" />
-    <Reference Include="..\..\..\lib\ServiceStack.Interfaces.dll" />
-    <Reference Include="..\..\..\lib\ServiceStack.Client.dll" />
-    <Reference Include="..\..\..\lib\ServiceStack.Common.dll" />
-    <Reference Include="..\..\..\lib\ServiceStack.dll" />
-    <Reference Include="..\..\..\lib\ServiceStack.Mvc.dll" />
-    <Reference Include="..\..\..\lib\ServiceStack.Redis.dll" />
-    <!--<PackageReference Include="ServiceStack.Interfaces.Core" Version="1.0.*" />
-    <PackageReference Include="ServiceStack.Client.Core" Version="1.0.*" />
-    <PackageReference Include="ServiceStack.Common.Core" Version="1.0.*" />
-    <PackageReference Include="ServiceStack.Core" Version="1.0.*" />
-    <PackageReference Include="ServiceStack.Mvc.Core" Version="1.0.*" />
-    <PackageReference Include="ServiceStack.Redis.Core" Version="1.0.*" />-->
-  </ItemGroup>
-
-  <ItemGroup>
-    <DotNetCliToolReference Include="BundlerMinifier.Core" Version="2.2.301" />
   </ItemGroup>
 
 </Project>
