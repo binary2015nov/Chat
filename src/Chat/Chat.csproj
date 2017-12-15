@@ -5,9 +5,15 @@
     <AssemblyName>Chat</AssemblyName>
     <PackageId>Chat</PackageId>
   </PropertyGroup>
-
+  
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.0" />
+    <None Update="wwwroot\**\*">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </None>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.3" />
 
     <Reference Include="..\..\lib\ServiceStack.Text.dll" />
     <Reference Include="..\..\lib\ServiceStack.Interfaces.dll" />
@@ -17,7 +23,9 @@
     <Reference Include="..\..\lib\ServiceStack.Mvc.dll" />
     <Reference Include="..\..\lib\ServiceStack.Redis.dll" />
   </ItemGroup>
-
+  
+  <ItemGroup>
+    <DotNetCliToolReference Include="BundlerMinifier.Core" Version="2.2.301" />
   </ItemGroup>
-
+  
 </Project>

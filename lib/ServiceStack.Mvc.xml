@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ServiceStack.Mvc</name>
+    </assembly>
+    <members>
+        <member name="P:ServiceStack.Mvc.ServiceStackController.UnauthorizedRedirectUrl">
+            <summary>
+            Default redirct URL if [Authenticate] attribute doesn't permit access.
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Mvc.ServiceStackController.AuthenticationErrorResult">
+            <summary>
+            To change the error result when authentication (<see cref="T:ServiceStack.AuthenticateAttribute"/>) fails.
+            Override this property and return the appropriate result.
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Mvc.ServiceStackController.ForbiddenRedirectUrl">
+            <summary>
+            Default redirct URL if Required Role or Permission attributes doesn't permit access.
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Mvc.ServiceStackController.ForbiddenErrorResult">
+            <summary>
+            To change the error result when user doesn't have required role or permissions (<see cref="T:ServiceStack.RequiredRoleAttribute"/>).
+            Override this property and return the appropriate result.
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Mvc.ServiceStackController.AuthorizationErrorResult">
+            <summary>
+            To change the error result when authorization fails
+            to something else, override this property and return the appropriate result.
+            </summary>
+        </member>
+    </members>
+</doc>
