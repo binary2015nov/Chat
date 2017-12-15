@@ -25,7 +25,7 @@ namespace Chat
                 .UseKestrel()
                 .UseContentRoot(Directory.GetCurrentDirectory())
                 .UseIISIntegration()
-                .UseUrls("http://0.0.0.0:5000/")
+                .UseUrls("http://localhost:5000")
                 .UseStartup<Startup>()
                 .Build();
 
@@ -65,24 +65,20 @@ namespace Chat
 
     public class AppHost : AppHostBase
     {
-        public AppHost() : base("Chat", typeof(ServerEventsServices).GetTypeInfo().Assembly)
+        public AppHost() : base("Chat", typeof(ServerEventsServices).Assembly)
         {
             var liveSettings = MapProjectPath("~/appsettings.txt");
             AppSettings = File.Exists(liveSettings)
                 ? (IAppSettings)new TextFileSettings(liveSettings)
-                : new AppSettings();
+                : ServiceStack.Configuration.AppSettings.Default;
+
+            Config.AllowSessionIdsInHttpParams = true;
         }
 
         public override void Configure(Container container)
         {
             Plugins.Add(new RazorFormat());
             Plugins.Add(new ServerEventsFeature());
-
-            SetConfig(new HostConfig
-            {
-                DefaultContentType = MimeTypes.Json,
-                AllowSessionIdsInHttpParams = true,
-            });
 
             this.CustomErrorHttpHandlers.Remove(HttpStatusCode.Forbidden);
 
@@ -102,6 +98,11 @@ namespace Chat
                 allowOriginWhitelist: new[] { "http://localhost", "http://127.0.0.1:8080", "http://localhost:8080", "http://localhost:8081", "http://null.jsbin.com" },
                 allowCredentials: true,
                 allowedHeaders: "Content-Type, Allow, Authorization"));
+        }
+
+        protected override void OnAfterInit()
+        {
+            Config.DefaultContentType = MimeTypes.Json;
         }
     }
 
@@ -357,7 +358,7 @@ namespace Chat
     {
         public object Get(GetUserDetails request)
         {
-            var session = GetSession();
+            var session = Request.GetSession();
             return session.ConvertTo<GetUserDetailsResponse>();
         }
     }
